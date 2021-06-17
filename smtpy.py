@@ -170,8 +170,9 @@ def SendMail( inputfile ):
          results = dns.resolver.resolve( domain, "MX" )
          host = str(results[0].exchange)
 
-         if host == "":
+         if host == "" or host == ".":
             print( "No record found." )
+            host = None
          else:
             print( f"Host set to \"{host}\"." )
       except dns.resolver.NXDOMAIN:
