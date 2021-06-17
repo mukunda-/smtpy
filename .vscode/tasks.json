@@ -1,0 +1,14 @@
+{
+   "label": "Submit",
+   "type": "shell",
+   "command": "py",
+   "args": [
+      "./smtpy.py",
+      "${file}"
+   ],
+   "problemMatchers": [],
+   "group": {
+     "kind": "build",
+     "isDefault": true
+   }
+}
