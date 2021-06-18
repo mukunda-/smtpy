@@ -195,9 +195,9 @@ def SendMail( inputfile ):
       print( "Adding Date field to payload." )
 
    if not has_message_id:
-      msgid = utils.make_msgid(None, ExtractDomain(mailfrom))
+      msgid = f"<{str(uuid.uuid4())}@{ExtractDomain(mailfrom)}>"
       payload_headers.append( f"Message-ID: {msgid}" )
-      print( "Adding Message-ID to payload." )
+      print( "Adding Message-ID to payload.", msgid )
 
    payload = "\r\n".join(payload_headers) + "\r\n\r\n" + "\r\n".join(payload)
 
@@ -222,9 +222,9 @@ def SendMail( inputfile ):
 
       print( ">> MAIL FROM:", mailfrom )
       print( ">> RCPT TO:", ", ".join(rcpt) )
-      print( "--- Payload ---" )
+      print( "--- DATA ---" )
       print( payload )
-      print( "---------------" )
+      print( "------------" )
       smtp.sendmail( mailfrom, rcpt, payload )
    
    print( "Mail submitted!" )
