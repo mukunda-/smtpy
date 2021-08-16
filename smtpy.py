@@ -24,13 +24,17 @@
 import smtplib, uuid, os, re, traceback, argparse, dns.resolver
 from email import utils
 
-VERSION = "v1.0"
+VERSION = "v1.1"
+
+VarSubs = {}
 
 #/////////////////////////////////////////////////////////////////////////////////////////
 def Main():
    print( "---------------------------" )
    print( f"## smtpy {VERSION}" )
    args = ParseArgs()
+   for i in range( 0, len(args.arg), 2 ):
+      VarSubs[args.arg[i]] = args.arg[i+1]
    inputfile = args.inputfile
    CheckInputFileExists( inputfile )
    SendMail( inputfile )
@@ -39,6 +43,9 @@ def Main():
 def ParseArgs():
    parser = argparse.ArgumentParser( description="Deliver an email to an SMTP server." )
    parser.add_argument( "inputfile", help="Smtpyfile. See template." )
+   parser.add_argument( "--arg", "-a",
+      metavar=("NAME","VAL"), action="extend", default=[], nargs=2, type=str,
+      help="For example, `--arg var 5`, to replace {{var}} in the smptyfile." )
    return parser.parse_args()
 
 #-----------------------------------------------------------------------------------------
@@ -76,6 +83,12 @@ def SplitHeader( line ):
 def StripNewlines( line ):
    return line.replace("\r", "").replace("\n", "")
 
+def InsertVariables_ReplaceFunc( match ):
+   return VarSubs.get( x[1], "" )
+
+def InsertVariables( line ):
+   return re.sub( r"{{(.*?)}}", InsertVariables_ReplaceFunc, line )
+
 #-----------------------------------------------------------------------------------------
 def SendMail( inputfile ):
 
@@ -99,6 +112,7 @@ def SendMail( inputfile ):
       for line in f:
          line = re.sub( r"#.*", "", line )
          line = line.strip()
+         line = InsertVariables(line)
          if line == "": continue
          if line.startswith("---"): break
 
@@ -108,7 +122,7 @@ def SendMail( inputfile ):
          if header == "from":
             mailfrom = line
          elif header == "to":
-            rcpt.append( [s.strip() for s in line.split(",")] )
+            rcpt.extend( [s.strip() for s in line.split(",")] )
          elif header == "helo":
             helo_domain = line
          elif header == "user":
@@ -129,6 +143,7 @@ def SendMail( inputfile ):
 
       for line in f:
          line = StripNewlines(line)
+         line = InsertVariables(line)
          if line == "": break
          payload_headers.append( line )
          (header, line) = SplitHeader( line )
@@ -148,7 +163,7 @@ def SendMail( inputfile ):
             has_message_id = True
       
       for line in f:
-         payload.append( StripNewlines(line) )
+         payload.append( InsertVariables(StripNewlines(line)) )
    
    if not mailfrom:
       print( "*** Error: missing MAIL FROM." )
