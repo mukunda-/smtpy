@@ -24,7 +24,7 @@
 import smtplib, uuid, os, re, traceback, argparse, dns.resolver
 from email import utils
 
-VERSION = "v1.1"
+VERSION = "v1.1.1"
 
 VarSubs = {}
 
@@ -108,7 +108,7 @@ def SendMail( inputfile ):
    password        = ""
    errors          = 0
    
-   with open( inputfile, "r" ) as f:
+   with open( inputfile, "r", encoding="utf-8" ) as f:
       for line in f:
          line = re.sub( r"#.*", "", line )
          line = line.strip()
@@ -209,7 +209,7 @@ def SendMail( inputfile ):
       payload_headers.append( f"Date: {utils.formatdate()}")
       print( "Adding Date field to payload." )
 
-   if not has_message_id:
+   if not has_message_id and not options.get("nomessageid"):
       msgid = f"<{str(uuid.uuid4())}@{ExtractDomain(mailfrom)}>"
       payload_headers.append( f"Message-ID: {msgid}" )
       print( "Adding Message-ID to payload.", msgid )
@@ -230,7 +230,8 @@ def SendMail( inputfile ):
       if options.get("tls"):
          print( ">> STARTTLS" )
          smtp.starttls()
-
+         smtp.ehlo( helo_domain )
+         
       if username:
          print( ">> LOGIN", username )
          smtp.login( username, password )
@@ -238,9 +239,11 @@ def SendMail( inputfile ):
       print( ">> MAIL FROM:", mailfrom )
       print( ">> RCPT TO:", ", ".join(rcpt) )
       print( "--- DATA ---" )
-      print( payload )
+      print( payload[0:10000] )
+      if len(payload) > 10000:
+         print( "...<truncated payload at 10000 bytes>..." )
       print( "------------" )
-      smtp.sendmail( mailfrom, rcpt, payload )
+      smtp.sendmail( mailfrom, rcpt, payload.encode("utf-8") )
    
    print( "Mail submitted!" )
    print( "---------------" )
