@@ -233,8 +233,8 @@ def SendMail( inputfile ):
          smtp.ehlo( helo_domain )
          
       if username:
-         print( ">> LOGIN", username )
-         smtp.login( username, password )
+         print( ">> LOGIN", username, len(password) * "*" )
+         print( "<<", smtp.login( username, password ) )
 
       print( ">> MAIL FROM:", mailfrom )
       print( ">> RCPT TO:", ", ".join(rcpt) )
@@ -243,7 +243,7 @@ def SendMail( inputfile ):
       if len(payload) > 10000:
          print( "...<truncated payload at 10000 bytes>..." )
       print( "------------" )
-      smtp.sendmail( mailfrom, rcpt, payload.encode("utf-8") )
+      print( "<<", smtp.sendmail( mailfrom, rcpt, payload.encode("utf-8") ) )
    
    print( "Mail submitted!" )
    print( "---------------" )
