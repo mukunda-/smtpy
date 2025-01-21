@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # smtpy
 # 
 # - A neat tool to test SMTP submission.
@@ -21,11 +22,13 @@
 # OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #/////////////////////////////////////////////////////////////////////////////////////////
-import smtplib, uuid, os, re, argparse, dns.resolver, io, sys
+import smtplib, uuid, os, re, argparse, dns.resolver, io, sys, ssl
 import tkinter as tk
 from tkinter import ttk
 from tkinter import scrolledtext
 from email import utils
+
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
 VERSION = "v1.2.0"
 
@@ -245,7 +248,7 @@ def SendMail(contents):
 
       if options.get("tls"):
          print(">> STARTTLS")
-         smtp.starttls()
+         smtp.starttls(context=ssl_context)
          smtp.ehlo(helo_domain)
          
       if username:

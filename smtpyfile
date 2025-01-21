@@ -1,27 +1,30 @@
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 # Example smtpyfile
-#-----------------------------------------------------------
-# Host to connect to. Defaults to recipient MX lookup.
+#-----------------------------------------------------------------------------------------
+# Host to connect to for mail submission. If not specified, then the host will be
+# retrieved from an MX record lookup on the recipient's domain.
 #host: example.com
 
 # Port to use, default 25.
 #port: 25
 
-# MAIL FROM address. Defaults to MIME From.
-# MIME From will also be set by this if absent.
+# MAIL FROM address. Defaults to MIME From address.
+# MIME From will also be added to the email headers if it isn't present.
 #from: sender@mail.example.com
 
-# RCPT TO address (comma separated or multiple inputs). Defaults to MIME To.
-# MIME To will also be added by this if absent.
+# RCPT TO address (comma separated or multiple inputs). Defaults to MIME To address.
+# MIME To will also be added to the email headers if it isn't present.
 #to: recipient@example.com
 
-# HELO domain. Defaults to MAIL FROM domain
+# HELO domain. What domain the client introduces itself with.
+# Defaults to MAIL FROM domain.
 #helo: mail.example.com
 
 # Comma-separated options:
-#   tls       Use starttls during connection.
-#   nofromto  Don't insert From: or To: headers in payload if they are missing.
-#   nodate    Don't insert Date: header if it is missing.
+#   tls       Use "starttls" during connection.
+#   nofromto  Don't insert From: or To: headers in email payload if they are missing.
+#   nodate    Don't insert Date: header if it is missing. By default, if no Date header
+#             is in the email, then the current date will be inserted.
 #   
 options: tls
 
