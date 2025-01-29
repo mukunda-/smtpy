@@ -11,7 +11,7 @@ executed by _smtpy_ to submit it to a mail server.
 Usage:
 
 ```
-$ ./smtp.py _smtpyfile_
+$ ./smtpy.py smtpyfile
 ```
 
 See the included _smtpyfile_ for additional documentation on what settings you can use.
